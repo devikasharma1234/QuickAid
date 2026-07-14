@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanjeevani Emergency Alert</title>
+<style>
+  body { font-family: -apple-system, Arial, sans-serif; margin: 0; padding: 20px;
+         background: #fff5f5; color: #1a1a1a; }
+  .card { max-width: 420px; margin: 0 auto; background: #fff; border-radius: 12px;
+          padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+  h1 { font-size: 20px; color: #c0392b; margin-top: 0; }
+  select, textarea { width: 100%; padding: 12px; margin: 8px 0 16px;
+                      border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+  button { width: 100%; padding: 14px; font-size: 16px; background: #c0392b;
+           color: white; border: none; border-radius: 8px; font-weight: bold; }
+  button:disabled { background: #999; }
+  #status { margin-top: 12px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🚨 Emergency Assistance</h1>
+  <p id="locStatus">Getting your location…</p>
+
+  <label>Cause of emergency</label>
+  <select id="cause">
+    <option value="">-- select --</option>
+    <option value="cardiac">Cardiac / Chest pain</option>
+    <option value="accident">Road accident</option>
+    <option value="breathing">Breathing difficulty</option>
+    <option value="injury">Severe injury / bleeding</option>
+    <option value="other">Other</option>
+  </select>
+
+  <textarea id="details" placeholder="Additional details (optional)" rows="3"></textarea>
+
+  <button id="submitBtn" disabled>Send My Location & Details</button>
+  <div id="status"></div>
+</div>
+
+<script>
+  const requestId = window.location.pathname.split('/').pop();
+  let coords = null;
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      coords = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+      };
+      document.getElementById('locStatus').textContent = '✅ Location captured';
+      document.getElementById('submitBtn').disabled = false;
+    },
+    (err) => {
+      document.getElementById('locStatus').textContent =
+        '⚠️ Could not get location automatically. Please enable location access and reload.';
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const cause = document.getElementById('cause').value;
+    const details = document.getElementById('details').value;
+
+    if (!cause) {
+      document.getElementById('status').textContent = 'Please select a cause of emergency.';
+      return;
+    }
+    if (!coords) {
+      document.getElementById('status').textContent = 'Location not available yet.';
+      return;
+    }
+
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('status').textContent = 'Sending…';
+
+    try {
+      const res = await fetch(`/api/emergency/${requestId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...coords,
+          cause: details ? `${cause}: ${details}` : cause,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        document.getElementById('status').textContent =
+          '✅ Sent! Help has been notified and is on the way.';
+      } else {
+        throw new Error(data.error || 'Failed to submit');
+      }
+    } catch (e) {
+      document.getElementById('status').textContent = '❌ Failed to send. Please try again.';
+      document.getElementById('submitBtn').disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
