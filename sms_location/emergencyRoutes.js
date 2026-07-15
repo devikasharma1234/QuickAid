@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express.Router();
 
-// db passed in from your main app (Supabase/pg client)
+// db passed in from your main app (Supabase client)
 module.exports = (db) => {
 
   // Serve the page the SMS link points to
   router.get('/emergency/:requestId', async (req, res) => {
     const { requestId } = req.params;
 
-    const { rows } = await db.query(
-      `SELECT status FROM emergency_requests WHERE id = $1`,
-      [requestId]
-    );
+    const { data, error } = await db
+      .from('emergency_requests')
+      .select('status')
+      .eq('id', requestId)
+      .single();
 
-    if (rows.length === 0) {
+    if (error || !data) {
       return res.status(404).send('Invalid or expired link.');
     }
-    if (rows[0].status !== 'pending') {
+    if (data.status !== 'pending') {
       return res.send('This request has already been submitted. Help is on the way.');
     }
 
@@ -24,7 +25,7 @@ module.exports = (db) => {
   });
 
   // Receive location + emergency details from the page
-  router.post('/api/emergency/:requestId', express.json(), async (req, res) => {
+  router.post('/api/emergency/:requestId', async (req, res) => {
     const { requestId } = req.params;
     const { latitude, longitude, accuracy, cause } = req.body;
 
@@ -32,13 +33,21 @@ module.exports = (db) => {
       return res.status(400).json({ error: 'Missing location or cause of emergency.' });
     }
 
-    await db.query(
-      `UPDATE emergency_requests
-       SET latitude = $1, longitude = $2, accuracy = $3, cause = $4,
-           status = 'submitted', submitted_at = NOW()
-       WHERE id = $5`,
-      [latitude, longitude, accuracy, cause, requestId]
-    );
+    const { error } = await db
+      .from('emergency_requests')
+      .update({
+        latitude,
+        longitude,
+        accuracy,
+        cause,
+        status: 'submitted',
+        submitted_at: new Date().toISOString(),
+      })
+      .eq('id', requestId);
+
+    if (error) {
+      return res.status(500).json({ error: 'Failed to save emergency details.' });
+    }
 
     // TODO: trigger your dispatch/routing engine here using PostGIS
     // e.g. find nearest available ambulance to (latitude, longitude)

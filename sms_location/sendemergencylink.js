@@ -3,22 +3,20 @@ const { v4: uuidv4 } = require('uuid');
 
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
 
-/**
- * Sends an SMS containing a one-time link that lets the user
- * share their live location + describe the emergency.
- *
- * @param {string} toPhoneNumber - E.164 format, e.g. "+919812345678"
- * @param {object} db - your Supabase/pg client
- */
 async function sendEmergencyLink(toPhoneNumber, db) {
   const requestId = uuidv4();
 
-  // Store a pending request row so we can match the response later
-  await db.query(
-    `INSERT INTO emergency_requests (id, phone_number, status, created_at)
-     VALUES ($1, $2, 'pending', NOW())`,
-    [requestId, toPhoneNumber]
-  );
+  const { error } = await db
+    .from('emergency_requests')
+    .insert({
+      id: requestId,
+      phone_number: toPhoneNumber,
+      status: 'pending',
+    });
+
+  if (error) {
+    throw new Error(`Failed to create emergency request: ${error.message}`);
+  }
 
   const link = `${process.env.BASE_URL}/emergency/${requestId}`;
 

@@ -11,6 +11,8 @@ app.get('/', (req, res) => {
 
 app.use(emergencyRoutes);
 
+app.use(express.json());
+
 app.post('/api/trigger-alert', async (req, res) => {
   const { phoneNumber } = req.body;
   const requestId = await sendEmergencyLink(phoneNumber, db);
