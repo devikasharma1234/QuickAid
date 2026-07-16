@@ -59,11 +59,11 @@ npm install
 Create a `.env` file in the root directory with:
 
 ```env
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_KEY=your_supabase_anon_or_service_key
-TWILIO_ACCOUNT_SID=your_twilio_account_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_PHONE_NUMBER=your_twilio_phone_number
+SUPABASE_URL=https://eyizqrotyzjegjhoybsy.supabase.co
+SUPABASE_PUBLISHABLE_KEY=sb_publishable_ROiKGgo6DY-z3p3JnTIsoA_pEg-xQjb
+SUPABASE_JWKS_URL=https://hghghg.supabase.co/auth/v1/.well-known/jwks.json
+TWILIO_ACCOUNT_SID=AC4a97a0f36e6b30ff0619af3e89f3c2f69uiuj
+TWILIO_AUTH_TOKEN=9173f6b9c830fd13fe3a1f97d2264c2a
 ```
 
 ### Run locally
@@ -76,12 +76,9 @@ The server will start and serve the dashboard from `public/`.
 
 ## Status
 
-This project is a work in progress, currently being built out as a hackathon submission (team: QuickAid). Core pieces in place: Express backend, Supabase/Postgres integration, and an SMS location module. Ambulance routing logic, the live WebSocket dashboard, and triage alerting are being actively developed.
+This project is a work in progress, currently being built. Core pieces in place: Express backend, Supabase/Postgres integration, and an SMS location module. Ambulance routing logic, the live WebSocket dashboard, and triage alerting are being actively developed.
 
 ## Team
 
-Built by Devika Sharma and team, UIET Kurukshetra.
+Built by Gavy || Devika Sharma || Manisha Dhankhar
 
-## License
-
-No license specified yet.
