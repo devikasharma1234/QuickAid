@@ -1,11 +1,30 @@
 {
+  "name": "quickaid",
+  "version": "1.0.0",
+  "description": "**Real-time hospital bed & ambulance dispatch OS**",
+  "homepage": "https://github.com/devikasharma1234/QuickAid#readme",
+  "bugs": {
+    "url": "https://github.com/devikasharma1234/QuickAid/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devikasharma1234/QuickAid.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.2",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "pg": "^8.22.0",
     "twilio": "^6.0.2",
-    "uuid": "^14.0.1",
-    "type": "module"
+    "uuid": "^14.0.1"
+   
   }
 }
