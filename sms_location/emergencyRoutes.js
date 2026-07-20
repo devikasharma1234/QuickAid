@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const router = express.Router();
 
 // db passed in from your main app (Supabase client)
@@ -21,7 +22,7 @@ module.exports = (db) => {
       return res.send('This request has already been submitted. Help is on the way.');
     }
 
-    res.sendFile(__dirname + '/public/location.html');
+    res.sendFile(path.join(__dirname, '..', 'public', 'location.html'));
   });
 
   // Receive location + emergency details from the page
