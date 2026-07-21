@@ -4,7 +4,7 @@ app.use(express.json());
 const PORT = 8080;
 const db = require('./supabase');
 const emergencyRoutes = require('./sms_location/emergencyRoutes')(db);
-const { sendEmergencyLink } = require('./sms_location/sendEmergencyLink');
+const sendEmergencyLink  = require('./sms_location/sendEmergencyLink');
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -13,7 +13,6 @@ app.get('/', (req, res) => {
 });
 
 app.use(emergencyRoutes);
-
 
 app.post('/api/trigger-alert', async (req, res) => {
   const { phoneNumber } = req.body;
