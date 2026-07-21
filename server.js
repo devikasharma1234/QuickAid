@@ -4,12 +4,11 @@ const PORT = 8080;
 const db = require('./supabase');
 app.use(express.json());
 const emergencyRoutes = require('./sms_location/emergencyRoutes')(db);
-const sendEmergencyLink = require('./sms_location/sendEmergencyLink');
+const { sendEmergencyLink } = require('./sms_location/sendEmergencyLink');
 
 app.get('/', (req, res) => {
     res.send('Runnning');
 });
-
 
 app.post('/api/incoming-call',async(req,res)=>{
     const callNumber = req.body.From;
