@@ -23,6 +23,10 @@
   <h1>🚨 Emergency Assistance</h1>
   <p id="locStatus">Getting your location…</p>
 
+  <label>Patient name</label>
+  <input type="text" id="patientName" placeholder="Enter patient's name">
+  <br><br>
+
   <label>Cause of emergency</label>
   <select id="cause">
     <option value="">-- select --</option>
@@ -61,9 +65,14 @@
   );
 
   document.getElementById('submitBtn').addEventListener('click', async () => {
+    const patientName = document.getElementById('patientName').value.trim();
     const cause = document.getElementById('cause').value;
     const details = document.getElementById('details').value;
 
+    if (!patientName) {
+      document.getElementById('status').textContent = "Please enter the patient's name.";
+      return;
+    }
     if (!cause) {
       document.getElementById('status').textContent = 'Please select a cause of emergency.';
       return;
@@ -82,6 +91,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...coords,
+          patient_name: patientName,
           cause: details ? `${cause}: ${details}` : cause,
         }),
       });

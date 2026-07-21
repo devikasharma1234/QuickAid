@@ -1,10 +1,12 @@
 const express = require('express');
 const app = express();
+app.use(express.json());
 const PORT = 8080;
 const db = require('./supabase');
-app.use(express.json());
 const emergencyRoutes = require('./sms_location/emergencyRoutes')(db);
 const { sendEmergencyLink } = require('./sms_location/sendEmergencyLink');
+
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
     res.send('Runnning');

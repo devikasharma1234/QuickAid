@@ -1,8 +1,9 @@
 const express = require('express');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 
-// db passed in from your main app (Supabase client)
+// db passed in from your main app (Supabase/pg client)
 module.exports = (db) => {
 
   // Serve the page the SMS link points to
@@ -22,17 +23,19 @@ module.exports = (db) => {
       return res.send('This request has already been submitted. Help is on the way.');
     }
 
-    res.sendFile(path.join(__dirname, '..', 'public', 'location.html'));
+    res.sendFile(__dirname + '/public/location.html');
   });
 
   // Receive location + emergency details from the page
   router.post('/api/emergency/:requestId', async (req, res) => {
     const { requestId } = req.params;
-    const { latitude, longitude, accuracy, cause } = req.body;
+    const { latitude, longitude, accuracy, cause, patient_name } = req.body;
 
-    if (latitude == null || longitude == null || !cause) {
-      return res.status(400).json({ error: 'Missing location or cause of emergency.' });
+    if (latitude == null || longitude == null || !cause || !patient_name) {
+      return res.status(400).json({ error: 'Missing patient name, location, or cause of emergency.' });
     }
+
+    const patient_id = uuidv4();
 
     const { error } = await db
       .from('emergency_requests')
@@ -41,6 +44,8 @@ module.exports = (db) => {
         longitude,
         accuracy,
         cause,
+        patient_name,
+        patient_id,
         status: 'submitted',
         submitted_at: new Date().toISOString(),
       })
@@ -58,3 +63,6 @@ module.exports = (db) => {
 
   return router;
 };
+
+
+
