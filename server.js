@@ -1,25 +1,28 @@
 const express = require('express');
 const app = express();
-app.use(express.json());
 const PORT = 8080;
 const db = require('./supabase');
+app.use(express.json());
 const emergencyRoutes = require('./sms_location/emergencyRoutes')(db);
-const sendEmergencyLink  = require('./sms_location/sendemergencyLink');
-
-app.use(express.urlencoded({ extended: true }));
+const { sendEmergencyLink } = require('./sms_location/sendEmergencyLink');
 
 app.get('/', (req, res) => {
     res.send('Runnning');
 });
 
-app.use(emergencyRoutes);
 
-app.post('/api/trigger-alert', async (req, res) => {
-  const { phoneNumber } = req.body;
-  const requestId = await sendEmergencyLink(phoneNumber, db);
-  res.json({ requestId });
-});
+app.post('/api/incoming-call',async(req,res)=>{
+    const callNumber = req.body.From;
 
+    const requestId =await sendEmergencyLink(callNumber,db);
+
+    res.type('text/xml');
+    res.send(
+        '<Response>' +
+        '<Say>Aapko SMS bheja gaya hai. Kripya apni location share karein.</Say>' +
+        '</Response>'
+    );
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
